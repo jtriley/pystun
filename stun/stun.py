@@ -92,7 +92,7 @@ def Test(s, host, port, source_ip, source_port, send_data=""):
             s.sendto(data,(host, port))
             try:
                 buf, addr = s.recvfrom(2048)
-                #log.debug("recvfrom: %s" % addr)
+                log.debug("recvfrom: %s" % str(addr))
                 recieved = True
             except Exception:
                 recieved = False
@@ -158,13 +158,13 @@ def Initialize():
         dictValToMsgType.update({items[i][1]:items[i][0]})
 
 
-def GetNATType(s, source_ip, source_port):
+def get_nat_type(s, source_ip, source_port):
     Initialize()
     host = "stun.ekiga.net"
     port = 3478
-    #log.debug("Do Test1")
+    log.debug("Do Test1")
     ret = Test(s, host, port, source_ip, source_port)
-    #log.debug("Result: %s" % ret)
+    log.debug("Result: %s" % ret)
     type = None
     exIP = ret['ExternalIP']
     exPort = ret['ExternalPort']
@@ -182,23 +182,23 @@ def GetNATType(s, source_ip, source_port):
                 type = SymmetricUDPFirewall
         else:
             changeRequest = ''.join([ChangeRequest,'0004',"00000006"])
-            #log.debug("Do Test2")
+            log.debug("Do Test2")
             ret = Test(s, host, port, source_ip, source_port, changeRequest)
-            #log.debug("Result: %s" % ret)
+            log.debug("Result: %s" % ret)
             if ret['Resp'] == True:
                 type = FullCone
             else:
-                #log.debug("Do Test1")
+                log.debug("Do Test1")
                 ret = Test(s, changedIP, changedPort, source_ip, source_port)
-                #log.debug("Result: %s" % ret)
+                log.debug("Result: %s" % ret)
                 if not ret['Resp']:
                     type = ChangedAddressError
                 else:
                     if exIP == ret['ExternalIP'] and exPort == ret['ExternalPort']:
                         changePortRequest = ''.join([ChangeRequest,'0004',"00000002"])
-                        #log.debug("Do Test3")
+                        log.debug("Do Test3")
                         ret = Test(s, changedIP, port, source_ip, source_port, changePortRequest)
-                        #log.debug("Result: %s" % ret)
+                        log.debug("Result: %s" % ret)
                         if ret['Resp'] == True:
                             type = RestricNAT
                         else:
@@ -213,7 +213,7 @@ def main(source_ip="0.0.0.0", source_port=54320):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
     s.bind((source_ip, source_port))
-    nat_type, nat = GetNATType(s, source_ip, source_port)
+    nat_type, nat = get_nat_type(s, source_ip, source_port)
     external_ip = nat['ExternalIP']
     external_port = nat['ExternalPort']
     print "NAT Type:", nat_type
