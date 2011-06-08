@@ -1,0 +1,6 @@
+*.pyc
+*.swp
+*.pkl
+pystun.egg-info
+build
+dist
