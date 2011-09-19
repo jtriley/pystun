@@ -145,9 +145,8 @@ def stun_test(sock, host, port, source_ip, source_port, send_data=""):
                     str(int(binascii.b2a_hex(buf[base+11:base+12]), 16))])
                     retVal['ChangedIP'] = ip
                     retVal['ChangedPort'] = port
-
-                if attr_type == ServerName:
-                    serverName = buf[(base+4):(base+4+attr_len)]
+                #if attr_type == ServerName:
+                    #serverName = buf[(base+4):(base+4+attr_len)]
                 base = base + 4 + attr_len
                 len_remain = len_remain - (4+attr_len)
     #s.close()
