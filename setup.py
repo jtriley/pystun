@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import os
-import sys
-from setuptools import setup, find_packages
+from setuptools import setup
 
 src = os.path.realpath(os.path.dirname(__file__))
 
@@ -14,9 +13,9 @@ setup(
     license='MIT',
     author='gaohawk',
     url="http://github.com/jtriley/pystun",
-    description="A Python STUN client for getting NAT type, followed RFC 3489.",
+    description="A Python STUN client for getting NAT type (RFC 3489)",
     long_description="""
-    A Python STUN client for getting NAT type, followed RFC 3489.
+    A Python STUN client for getting NAT type (RFC 3489).
     """,
     classifiers=[
         "TODO"
