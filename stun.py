@@ -1,8 +1,5 @@
-#!/usr/bin/env python
 #coding=utf-8
 
-import sys
-import struct
 import random
 import socket
 import binascii
@@ -59,6 +56,10 @@ dictMsgTypeToVal = {'BindRequestMsg'              :BindRequestMsg,
                     'SharedSecretResponseMsg'     :SharedSecretResponseMsg,
                     'SharedSecretErrorResponseMsg':SharedSecretErrorResponseMsg}
 
+dictValToMsgType = {}
+
+dictValToAttr = {}
+
 Blocked = "Blocked"
 OpenInternet = "Open Internet"
 FullCone = "Full Cone"
@@ -68,20 +69,29 @@ RestricPortNAT = "Restric Port NAT"
 SymmetricNAT = "Symmetric NAT"
 ChangedAddressError = "Meet an error, when do Test1 on Changed IP and Port"
 
-def GenTranID():
+
+def _initialize():
+    items = dictAttrToVal.items()
+    for i in xrange(len(items)):
+        dictValToAttr.update({items[i][1]:items[i][0]})
+    items = dictMsgTypeToVal.items()
+    for i in xrange(len(items)):
+        dictValToMsgType.update({items[i][1]:items[i][0]})
+
+
+def gen_tran_id():
     a =''
     for i in xrange(32):
         a+=random.choice('0123456789ABCDEF')
     #return binascii.a2b_hex(a)
     return a
 
-def Test(s, host, port, source_ip, source_port, send_data=""):
+
+def stun_test(sock, host, port, source_ip, source_port, send_data=""):
     retVal = {'Resp':False, 'ExternalIP':None, 'ExternalPort':None, 'SourceIP':None, 'SourcePort':None, 'ChangedIP':None, 'ChangedPort':None}
-
     str_len = "%#04d" % (len(send_data)/2)
-    TranID = GenTranID()
+    TranID = gen_tran_id()
     str_data = ''.join([BindRequestMsg, str_len, TranID, send_data])
-
     data = binascii.a2b_hex(str_data)
     recvCorr = False
     while not recvCorr:
@@ -89,9 +99,9 @@ def Test(s, host, port, source_ip, source_port, send_data=""):
         count = 3
         while not recieved:
             log.debug("sendto %s" % str((host, port)))
-            s.sendto(data,(host, port))
+            sock.sendto(data,(host, port))
             try:
-                buf, addr = s.recvfrom(2048)
+                buf, addr = sock.recvfrom(2048)
                 log.debug("recvfrom: %s" % str(addr))
                 recieved = True
             except Exception:
@@ -101,7 +111,6 @@ def Test(s, host, port, source_ip, source_port, send_data=""):
                 else:
                     retVal['Resp'] = False
                     return retVal
-
         MsgType = binascii.b2a_hex(buf[0:2])
         if dictValToMsgType[MsgType] == "BindResponseMsg" and TranID.upper() == binascii.b2a_hex(buf[4:20]).upper():
             recvCorr = True
@@ -120,7 +129,6 @@ def Test(s, host, port, source_ip, source_port, send_data=""):
                     str(int(binascii.b2a_hex(buf[base+11:base+12]), 16))])
                     retVal['ExternalIP'] = ip
                     retVal['ExternalPort'] = port
-
                 if attr_type == SourceAddress:
                     port = int(binascii.b2a_hex(buf[base+6:base+8]), 16)
                     ip = "".join([str(int(binascii.b2a_hex(buf[base+8:base+9]), 16)),'.',
@@ -145,67 +153,55 @@ def Test(s, host, port, source_ip, source_port, send_data=""):
     #s.close()
     return retVal
 
-def Initialize():
-    items = dictAttrToVal.items()
-    global dictValToAttr
-    dictValToAttr = {}
-    for i in xrange(len(items)):
-        dictValToAttr.update({items[i][1]:items[i][0]})
-    items = dictMsgTypeToVal.items()
-    global dictValToMsgType
-    dictValToMsgType = {}
-    for i in xrange(len(items)):
-        dictValToMsgType.update({items[i][1]:items[i][0]})
-
 
 def get_nat_type(s, source_ip, source_port):
-    Initialize()
+    _initialize()
     host = "stun.ekiga.net"
     port = 3478
     log.debug("Do Test1")
-    ret = Test(s, host, port, source_ip, source_port)
+    ret = stun_test(s, host, port, source_ip, source_port)
     log.debug("Result: %s" % ret)
-    type = None
+    typ = None
     exIP = ret['ExternalIP']
     exPort = ret['ExternalPort']
     changedIP = ret['ChangedIP']
     changedPort = ret['ChangedPort']
     if not ret['Resp']:
-        type = Blocked
+        typ = Blocked
     else:
         if ret['ExternalIP'] == source_ip:
             changeRequest = ''.join([ChangeRequest,'0004',"00000006"])
-            ret = Test(s, host, port, source_ip, source_port, changeRequest)
+            ret = stun_test(s, host, port, source_ip, source_port, changeRequest)
             if ret['Resp'] == True:
-                type = OpenInternet
+                typ = OpenInternet
             else:
-                type = SymmetricUDPFirewall
+                typ = SymmetricUDPFirewall
         else:
             changeRequest = ''.join([ChangeRequest,'0004',"00000006"])
             log.debug("Do Test2")
-            ret = Test(s, host, port, source_ip, source_port, changeRequest)
+            ret = stun_test(s, host, port, source_ip, source_port, changeRequest)
             log.debug("Result: %s" % ret)
             if ret['Resp'] == True:
-                type = FullCone
+                typ = FullCone
             else:
                 log.debug("Do Test1")
-                ret = Test(s, changedIP, changedPort, source_ip, source_port)
+                ret = stun_test(s, changedIP, changedPort, source_ip, source_port)
                 log.debug("Result: %s" % ret)
                 if not ret['Resp']:
-                    type = ChangedAddressError
+                    typ = ChangedAddressError
                 else:
                     if exIP == ret['ExternalIP'] and exPort == ret['ExternalPort']:
                         changePortRequest = ''.join([ChangeRequest,'0004',"00000002"])
                         log.debug("Do Test3")
-                        ret = Test(s, changedIP, port, source_ip, source_port, changePortRequest)
+                        ret = stun_test(s, changedIP, port, source_ip, source_port, changePortRequest)
                         log.debug("Result: %s" % ret)
                         if ret['Resp'] == True:
-                            type = RestricNAT
+                            typ = RestricNAT
                         else:
-                            type = RestricPortNAT
+                            typ = RestricPortNAT
                     else:
-                        type = SymmetricNAT
-    return type, ret
+                        typ = SymmetricNAT
+    return typ, ret
 
 
 def main(source_ip="0.0.0.0", source_port=54320):
