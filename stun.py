@@ -8,6 +8,23 @@ import logging
 
 log = logging.getLogger("pystun")
 
+def enable_logging():
+    logging.basicConfig()
+    log.setLevel(logging.DEBUG)
+
+stun_servers_list = (
+    'stun.xten.com',       # 0
+    'stun01.sipphone.com', # 1
+    'stunserver.org',      # 2
+    'stun.ideasip.com',    # 3 - no XOR-MAPPED-ADDRESS
+    'stun.softjoys.com',   # 4 - no XOR-MAPPED-ADDRESS
+    'stun.voipbuster.com', # 5 - no XOR-MAPPED-ADDRESS
+    'stun.voxgratia.org',  # 6
+    'numb.viagenie.ca',    # 7
+    'stun.sipgate.net',    # 8 - ports 3478 & 10000
+    "stun.ekiga.net",      # 9
+)
+
 #stun attributes
 MappedAddress    = '0001'
 ResponseAddress  = '0002'
@@ -155,51 +172,54 @@ def stun_test(sock, host, port, source_ip, source_port, send_data=""):
 
 def get_nat_type(s, source_ip, source_port):
     _initialize()
-    host = "stun.ekiga.net"
     port = 3478
     log.debug("Do Test1")
-    ret = stun_test(s, host, port, source_ip, source_port)
+    resp = False
+    for host in stun_servers_list:
+        log.debug('Trying STUN host: %s' % host)
+        ret = stun_test(s, host, port, source_ip, source_port)
+        resp = ret['Resp']
+        if resp:
+            break
+    if not resp:
+        return Blocked, ret
     log.debug("Result: %s" % ret)
-    typ = None
     exIP = ret['ExternalIP']
     exPort = ret['ExternalPort']
     changedIP = ret['ChangedIP']
     changedPort = ret['ChangedPort']
-    if not ret['Resp']:
-        typ = Blocked
-    else:
-        if ret['ExternalIP'] == source_ip:
-            changeRequest = ''.join([ChangeRequest,'0004',"00000006"])
-            ret = stun_test(s, host, port, source_ip, source_port, changeRequest)
-            if ret['Resp'] == True:
-                typ = OpenInternet
-            else:
-                typ = SymmetricUDPFirewall
+    if ret['ExternalIP'] == source_ip:
+        changeRequest = ''.join([ChangeRequest,'0004',"00000006"])
+        ret = stun_test(s, host, port, source_ip, source_port, changeRequest)
+        if ret['Resp']:
+            typ = OpenInternet
         else:
-            changeRequest = ''.join([ChangeRequest,'0004',"00000006"])
-            log.debug("Do Test2")
-            ret = stun_test(s, host, port, source_ip, source_port, changeRequest)
+            typ = SymmetricUDPFirewall
+    else:
+        changeRequest = ''.join([ChangeRequest,'0004',"00000006"])
+        log.debug("Do Test2")
+        ret = stun_test(s, host, port, source_ip, source_port, changeRequest)
+        log.debug("Result: %s" % ret)
+        if ret['Resp']:
+            typ = FullCone
+        else:
+            log.debug("Do Test1")
+            ret = stun_test(s, changedIP, changedPort, source_ip, source_port)
             log.debug("Result: %s" % ret)
-            if ret['Resp'] == True:
-                typ = FullCone
+            if not ret['Resp']:
+                typ = ChangedAddressError
             else:
-                log.debug("Do Test1")
-                ret = stun_test(s, changedIP, changedPort, source_ip, source_port)
-                log.debug("Result: %s" % ret)
-                if not ret['Resp']:
-                    typ = ChangedAddressError
-                else:
-                    if exIP == ret['ExternalIP'] and exPort == ret['ExternalPort']:
-                        changePortRequest = ''.join([ChangeRequest,'0004',"00000002"])
-                        log.debug("Do Test3")
-                        ret = stun_test(s, changedIP, port, source_ip, source_port, changePortRequest)
-                        log.debug("Result: %s" % ret)
-                        if ret['Resp'] == True:
-                            typ = RestricNAT
-                        else:
-                            typ = RestricPortNAT
+                if exIP == ret['ExternalIP'] and exPort == ret['ExternalPort']:
+                    changePortRequest = ''.join([ChangeRequest,'0004',"00000002"])
+                    log.debug("Do Test3")
+                    ret = stun_test(s, changedIP, port, source_ip, source_port, changePortRequest)
+                    log.debug("Result: %s" % ret)
+                    if ret['Resp'] == True:
+                        typ = RestricNAT
                     else:
-                        typ = SymmetricNAT
+                        typ = RestricPortNAT
+                else:
+                    typ = SymmetricNAT
     return typ, ret
 
 
@@ -215,6 +235,7 @@ def get_ip_info(source_ip="0.0.0.0", source_port=54320):
     return (nat_type, external_ip, external_port)
 
 if __name__ == '__main__':
+    enable_logging()
     nat_type, external_ip, external_port = get_ip_info()
     print "NAT Type:", nat_type
     print "External IP:", external_ip
