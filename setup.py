@@ -9,16 +9,18 @@ setup(
     version="0.0.2",
     packages=find_packages(),
     scripts=['bin/pystun'],
-    zip_safe=True,
-    download_url='http://github.com/jtriley/pystun',
+    zip_safe=False,
     license='MIT',
     author='gaohawk',
     url="http://github.com/jtriley/pystun",
-    description="A Python STUN client for getting NAT type (RFC 3489)",
+    description="A Python STUN client for getting NAT type and external IP (RFC 3489)",
     long_description="""
-    A Python STUN client for getting NAT type (RFC 3489).
+    A Python STUN client for getting NAT type and external IP (RFC 3489).
     """,
     classifiers=[
-        "TODO"
+        "License :: OSI Approved :: MIT License",
+        "Topic :: Internet",
+        "Topic :: System :: Networking :: Firewalls",
+        "Programming Language :: Python",
     ],
 )
