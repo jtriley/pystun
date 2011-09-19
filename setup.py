@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 import os
-from setuptools import setup
+from setuptools import setup, find_packages
 
 src = os.path.realpath(os.path.dirname(__file__))
 
 setup(
     name='pystun',
     version="0.0.2",
-    py_modules = ['stun'],
+    packages=find_packages(),
+    scripts=['bin/pystun'],
     zip_safe=True,
     download_url='http://github.com/jtriley/pystun',
     license='MIT',

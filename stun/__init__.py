@@ -8,6 +8,7 @@ import logging
 
 log = logging.getLogger("pystun")
 
+
 def enable_logging():
     logging.basicConfig()
     log.setLevel(logging.DEBUG)
@@ -170,17 +171,21 @@ def stun_test(sock, host, port, source_ip, source_port, send_data=""):
     return retVal
 
 
-def get_nat_type(s, source_ip, source_port):
+def get_nat_type(s, source_ip, source_port, stun_host=None):
     _initialize()
     port = 3478
     log.debug("Do Test1")
     resp = False
-    for host in stun_servers_list:
-        log.debug('Trying STUN host: %s' % host)
-        ret = stun_test(s, host, port, source_ip, source_port)
+    if stun_host:
+        ret = stun_test(s, stun_host, port, source_ip, source_port)
         resp = ret['Resp']
-        if resp:
-            break
+    else:
+        for host in stun_servers_list:
+            log.debug('Trying STUN host: %s' % host)
+            ret = stun_test(s, host, port, source_ip, source_port)
+            resp = ret['Resp']
+            if resp:
+                break
     if not resp:
         return Blocked, ret
     log.debug("Result: %s" % ret)
@@ -223,20 +228,23 @@ def get_nat_type(s, source_ip, source_port):
     return typ, ret
 
 
-def get_ip_info(source_ip="0.0.0.0", source_port=54320):
+def get_ip_info(source_ip="0.0.0.0", source_port=54320, stun_host=None):
     socket.setdefaulttimeout(2)
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
     s.bind((source_ip, source_port))
-    nat_type, nat = get_nat_type(s, source_ip, source_port)
+    nat_type, nat = get_nat_type(s, source_ip, source_port,
+                                 stun_host=stun_host)
     external_ip = nat['ExternalIP']
     external_port = nat['ExternalPort']
     s.close()
     return (nat_type, external_ip, external_port)
 
-if __name__ == '__main__':
-    enable_logging()
+def main():
     nat_type, external_ip, external_port = get_ip_info()
     print "NAT Type:", nat_type
     print "External IP:", external_ip
     print "External Port:", external_port
+
+if __name__ == '__main__':
+    main()
