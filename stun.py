@@ -203,7 +203,7 @@ def get_nat_type(s, source_ip, source_port):
     return typ, ret
 
 
-def main(source_ip="0.0.0.0", source_port=54320):
+def get_ip_info(source_ip="0.0.0.0", source_port=54320):
     socket.setdefaulttimeout(2)
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
@@ -211,10 +211,11 @@ def main(source_ip="0.0.0.0", source_port=54320):
     nat_type, nat = get_nat_type(s, source_ip, source_port)
     external_ip = nat['ExternalIP']
     external_port = nat['ExternalPort']
+    s.close()
+    return (nat_type, external_ip, external_port)
+
+if __name__ == '__main__':
+    nat_type, external_ip, external_port = get_ip_info()
     print "NAT Type:", nat_type
     print "External IP:", external_ip
     print "External Port:", external_port
-    s.close()
-
-if __name__ == '__main__':
-    main()
