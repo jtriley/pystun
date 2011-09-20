@@ -4,6 +4,8 @@ from setuptools import setup, find_packages
 
 src = os.path.realpath(os.path.dirname(__file__))
 
+README = open(os.path.join(src, 'README.rst')).read()
+
 setup(
     name='pystun',
     version="0.0.2",
@@ -14,9 +16,7 @@ setup(
     author='gaohawk',
     url="http://github.com/jtriley/pystun",
     description="A Python STUN client for getting NAT type and external IP (RFC 3489)",
-    long_description="""
-    A Python STUN client for getting NAT type and external IP (RFC 3489).
-    """,
+    long_description=README,
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Topic :: Internet",
