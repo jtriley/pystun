@@ -117,7 +117,11 @@ def stun_test(sock, host, port, source_ip, source_port, send_data=""):
         count = 3
         while not recieved:
             log.debug("sendto %s" % str((host, port)))
-            sock.sendto(data,(host, port))
+            try:
+                sock.sendto(data,(host, port))
+            except socket.gaierror:
+                retVal['Resp'] = False
+                return retVal
             try:
                 buf, addr = sock.recvfrom(2048)
                 log.debug("recvfrom: %s" % str(addr))
@@ -176,15 +180,18 @@ def get_nat_type(s, source_ip, source_port, stun_host=None):
     port = 3478
     log.debug("Do Test1")
     resp = False
+    host = None
     if stun_host:
         ret = stun_test(s, stun_host, port, source_ip, source_port)
+        host = stun_host
         resp = ret['Resp']
     else:
-        for host in stun_servers_list:
-            log.debug('Trying STUN host: %s' % host)
-            ret = stun_test(s, host, port, source_ip, source_port)
+        for h in stun_servers_list:
+            log.debug('Trying STUN host: %s' % h)
+            ret = stun_test(s, h, port, source_ip, source_port)
             resp = ret['Resp']
             if resp:
+                host = h
                 break
     if not resp:
         return Blocked, ret
