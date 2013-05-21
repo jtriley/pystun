@@ -5,6 +5,7 @@ import socket
 import binascii
 import logging
 
+__version__ = "0.0.2"
 
 log = logging.getLogger("pystun")
 

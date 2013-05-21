@@ -5,7 +5,7 @@ import stun
 
 
 def main():
-    parser = optparse.OptionParser()
+    parser = optparse.OptionParser(version=stun.__version__)
     parser.add_option("-d", "--debug", dest="DEBUG", action="store_true",
                       default=False, help="Enable debug logging")
     parser.add_option("-H", "--host", dest="stun_host", default=None,
