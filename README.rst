@@ -42,6 +42,7 @@ Pass --help for more options::
     Usage: pystun [options]
 
     Options:
+      --version             show program's version number and exit
       -h, --help            show this help message and exit
       -d, --debug           Enable debug logging
       -H STUN_HOST, --host=STUN_HOST
