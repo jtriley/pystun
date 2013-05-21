@@ -42,6 +42,7 @@ Pass --help for more options::
     Usage: pystun [options]
 
     Options:
+      --version             show program's version number and exit
       -h, --help            show this help message and exit
       -d, --debug           Enable debug logging
       -H STUN_HOST, --host=STUN_HOST
@@ -76,3 +77,14 @@ Read the code for more details...
 LICENSE
 -------
 MIT
+
+Changelog
+---------
+
+0.0.3 (05/21/2013)
+******************
+- Stun: fix UnboundLocalError in get_nat_type.
+- Stun: remove dead hosts from stun server list.
+- Handling get address info error.
+- Add version info to stun module and stun.cli.
+- Add MANIFEST.in and include README.rst.

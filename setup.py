@@ -8,7 +8,7 @@ README = open(os.path.join(src, 'README.rst')).read()
 
 setup(
     name='pystun',
-    version="0.0.2",
+    version="0.0.3",
     packages=find_packages(),
     scripts=['bin/pystun'],
     zip_safe=False,
