@@ -189,9 +189,9 @@ def get_nat_type(s, source_ip, source_port, stun_host=None):
         ret = stun_test(s, stun_host, port, source_ip, source_port)
         resp = ret['Resp']
     else:
-        for host in stun_servers_list:
-            log.debug('Trying STUN host: %s' % host)
-            ret = stun_test(s, host, port, source_ip, source_port)
+        for stun_host in stun_servers_list:
+            log.debug('Trying STUN host: %s' % stun_host)
+            ret = stun_test(s, stun_host, port, source_ip, source_port)
             resp = ret['Resp']
             if resp:
                 break
@@ -204,7 +204,8 @@ def get_nat_type(s, source_ip, source_port, stun_host=None):
     changedPort = ret['ChangedPort']
     if ret['ExternalIP'] == source_ip:
         changeRequest = ''.join([ChangeRequest, '0004', "00000006"])
-        ret = stun_test(s, host, port, source_ip, source_port, changeRequest)
+        ret = stun_test(s, stun_host, port, source_ip, source_port,
+                        changeRequest)
         if ret['Resp']:
             typ = OpenInternet
         else:
@@ -212,7 +213,8 @@ def get_nat_type(s, source_ip, source_port, stun_host=None):
     else:
         changeRequest = ''.join([ChangeRequest, '0004', "00000006"])
         log.debug("Do Test2")
-        ret = stun_test(s, host, port, source_ip, source_port, changeRequest)
+        ret = stun_test(s, stun_host, port, source_ip, source_port,
+                        changeRequest)
         log.debug("Result: %s" % ret)
         if ret['Resp']:
             typ = FullCone
