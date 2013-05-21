@@ -77,3 +77,14 @@ Read the code for more details...
 LICENSE
 -------
 MIT
+
+Changelog
+---------
+
+0.0.3 (05/21/2013)
+******************
+- Stun: fix UnboundLocalError in get_nat_type.
+- Stun: remove dead hosts from stun server list.
+- Handling get address info error.
+- Add version info to stun module and stun.cli.
+- Add MANIFEST.in and include README.rst.
