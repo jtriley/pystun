@@ -10,6 +10,8 @@ def main():
                       default=False, help="Enable debug logging")
     parser.add_option("-H", "--host", dest="stun_host", default=None,
                       help="STUN host to use")
+    parser.add_option("-P", "--hostPort", dest="stun_port", default=3478,
+                      help="STUN host port to use")
     parser.add_option("-i", "--interface", dest="source_ip", default="0.0.0.0",
                       help="network interface for client (default: 0.0.0.0)")
     parser.add_option("-p", "--port", dest="source_port", type="int",
@@ -20,7 +22,8 @@ def main():
         stun.enable_logging()
     kwargs = dict(source_ip=options.source_ip,
                   source_port=int(options.source_port),
-                  stun_host=options.stun_host)
+                  stun_host=options.stun_host,
+                  stun_port=options.stun_port)
     nat_type, external_ip, external_port = stun.get_ip_info(**kwargs)
     print "NAT Type:", nat_type
     print "External IP:", external_ip
