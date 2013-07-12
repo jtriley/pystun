@@ -182,7 +182,7 @@ def stun_test(sock, host, port, source_ip, source_port, send_data=""):
 
 def get_nat_type(s, source_ip, source_port, stun_host=None, stun_port=3478):
     _initialize()
-    port = int(stun_port)
+    port = stun_port
     log.debug("Do Test1")
     resp = False
     if stun_host:
