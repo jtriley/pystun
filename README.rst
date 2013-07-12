@@ -67,9 +67,9 @@ If you prefer to use a specific STUN server::
 
     nat_type, external_ip, external_port = stun.get_ip_info(stun_host='stun.ekiga.net')
 
-If you prefer to use a specific STUN server and STUN server port::
+If you prefer to use a specific STUN server port::
 
-    nat_type, external_ip, external_port = stun.get_ip_info(stun_host='stun.ekiga.net', stun_port=3478)
+    nat_type, external_ip, external_port = stun.get_ip_info(stun_port=3478)
 
 You may also specify the client interface and port that is used although this
 is not needed::
@@ -89,6 +89,7 @@ Changelog
 
 0.0.3 (05/21/2013)
 ******************
+- Stun: added functionality to pass the initial STUN server port explicitly
 - Stun: fix UnboundLocalError in get_nat_type.
 - Stun: remove dead hosts from stun server list.
 - Handling get address info error.
