@@ -10,8 +10,8 @@ def main():
                       default=False, help="Enable debug logging")
     parser.add_option("-H", "--host", dest="stun_host", default=None,
                       help="STUN host to use")
-    parser.add_option("-P", "--hostPort", dest="stun_port", default=3478,
-                      help="STUN host port to use")
+    parser.add_option("-P", "--hostPort", dest="stun_port", type="int",
+                      default=3478, help="STUN host port to use (default: 3478)")
     parser.add_option("-i", "--interface", dest="source_ip", default="0.0.0.0",
                       help="network interface for client (default: 0.0.0.0)")
     parser.add_option("-p", "--port", dest="source_port", type="int",
