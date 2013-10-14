@@ -86,10 +86,12 @@ MIT
 
 Changelog
 ---------
+0.0.4 (10/14/2013)
+******************
+- Stun: added functionality to pass the initial STUN server port explicitly
 
 0.0.3 (05/21/2013)
 ******************
-- Stun: added functionality to pass the initial STUN server port explicitly
 - Stun: fix UnboundLocalError in get_nat_type.
 - Stun: remove dead hosts from stun server list.
 - Handling get address info error.
