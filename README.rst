@@ -47,6 +47,8 @@ Pass --help for more options::
       -d, --debug           Enable debug logging
       -H STUN_HOST, --host=STUN_HOST
                             STUN host to use
+      -P STUN_PORT, --host-port=STUN_PORT
+                            STUN host port to use (default: 3478)
       -i SOURCE_IP, --interface=SOURCE_IP
                             network interface for client (default: 0.0.0.0)
       -p SOURCE_PORT, --port=SOURCE_PORT
@@ -65,6 +67,10 @@ If you prefer to use a specific STUN server::
 
     nat_type, external_ip, external_port = stun.get_ip_info(stun_host='stun.ekiga.net')
 
+If you prefer to use a specific STUN server port::
+
+    nat_type, external_ip, external_port = stun.get_ip_info(stun_port=3478)
+
 You may also specify the client interface and port that is used although this
 is not needed::
 
@@ -80,6 +86,9 @@ MIT
 
 Changelog
 ---------
+0.0.4 (10/14/2013)
+******************
+- Stun: added functionality to pass the initial STUN server port explicitly
 
 0.0.3 (05/21/2013)
 ******************

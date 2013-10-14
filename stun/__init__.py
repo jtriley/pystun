@@ -5,7 +5,7 @@ import socket
 import binascii
 import logging
 
-__version__ = "0.0.3"
+__version__ = "0.0.4"
 
 log = logging.getLogger("pystun")
 
@@ -180,9 +180,9 @@ def stun_test(sock, host, port, source_ip, source_port, send_data=""):
     return retVal
 
 
-def get_nat_type(s, source_ip, source_port, stun_host=None):
+def get_nat_type(s, source_ip, source_port, stun_host=None, stun_port=3478):
     _initialize()
-    port = 3478
+    port = stun_port
     log.debug("Do Test1")
     resp = False
     if stun_host:
@@ -241,13 +241,14 @@ def get_nat_type(s, source_ip, source_port, stun_host=None):
     return typ, ret
 
 
-def get_ip_info(source_ip="0.0.0.0", source_port=54320, stun_host=None):
+def get_ip_info(source_ip="0.0.0.0", source_port=54320, stun_host=None,
+                stun_port=3478):
     socket.setdefaulttimeout(2)
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind((source_ip, source_port))
     nat_type, nat = get_nat_type(s, source_ip, source_port,
-                                 stun_host=stun_host)
+                                 stun_host=stun_host, stun_port=stun_port)
     external_ip = nat['ExternalIP']
     external_port = nat['ExternalPort']
     s.close()
