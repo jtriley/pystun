@@ -47,7 +47,7 @@ Pass --help for more options::
       -d, --debug           Enable debug logging
       -H STUN_HOST, --host=STUN_HOST
                             STUN host to use
-      -P STUN_PORT, --hostPort=STUN_PORT
+      -P STUN_PORT, --host-port=STUN_PORT
                             STUN host port to use (default: 3478)
       -i SOURCE_IP, --interface=SOURCE_IP
                             network interface for client (default: 0.0.0.0)
