@@ -83,11 +83,8 @@ RestricNAT = "Restric NAT"
 RestricPortNAT = "Restric Port NAT"
 SymmetricNAT = "Symmetric NAT"
 ChangedAddressError = "Meet an error, when do Test1 on Changed IP and Port"
-StunServertNotAccessible = "Stun host not accessible"
+NotEnoughEvidence = "No enough evidence to judge NAT type"
 
-
-class BindErrorResponseException(Exception):
-    pass
 
 def _initialize():
     items = dictAttrToVal.items()
@@ -105,7 +102,7 @@ def gen_tran_id():
     return a
 
 
-def stun_test(sock, host, port, source_ip, source_port, send_data=""):
+def stun_test(sock, host, port, source_ip, source_port, send_data="", retry=3):
     retVal = {'Resp': False, 'ExternalIP': None, 'ExternalPort': None,
               'SourceIP': None, 'SourcePort': None, 'ChangedIP': None,
               'ChangedPort': None}
@@ -114,7 +111,6 @@ def stun_test(sock, host, port, source_ip, source_port, send_data=""):
     str_data = ''.join([BindRequestMsg, str_len, tranid, send_data])
     data = binascii.a2b_hex(str_data)
     recieved = False
-    count = 3
     while not recieved:
         log.debug("sendto %s" % str((host, port)))
         try:
@@ -128,13 +124,15 @@ def stun_test(sock, host, port, source_ip, source_port, send_data=""):
             recieved = True
         except Exception:
             recieved = False
-            if count > 1:
-                count -= 1
+            if retry > 0:
+                retry -= 1
             else:
                 retVal['Resp'] = False
                 return retVal
+    log.debug("sock: %s" % str(addr))
     msgtype = binascii.b2a_hex(buf[0:2])
     bind_resp_msg = dictValToMsgType[msgtype] == "BindResponseMsg"
+    log.debug("msgtype : %s" % dictValToMsgType[msgtype])
     tranid_match = tranid.upper() == binascii.b2a_hex(buf[4:20]).upper()
     if bind_resp_msg and tranid_match:
         retVal['Resp'] = True
@@ -175,9 +173,7 @@ def stun_test(sock, host, port, source_ip, source_port, send_data=""):
             base = base + 4 + attr_len
             len_remain = len_remain - (4 + attr_len)
     else:
-        retVal = None
-    if retVal is None:
-        raise BindErrorResponseException
+        retVal['Resp'] = False
     return retVal
 
 
@@ -186,63 +182,63 @@ def get_nat_type(s, source_ip, source_port, stun_host=None, stun_port=3478):
     port = stun_port
     log.debug("Do Test1")
     resp = False
-    typ = StunServertNotAccessible
-    try:
-        if stun_host:
+
+    if stun_host:
+        ret = stun_test(s, stun_host, port, source_ip, source_port)
+        resp = ret['Resp']
+    else:
+        for stun_host in stun_servers_list:
+            log.debug('Trying STUN host: %s' % stun_host)
             ret = stun_test(s, stun_host, port, source_ip, source_port)
             resp = ret['Resp']
+            if resp:
+                break
+    if not resp:
+        return Blocked, ret
+    log.debug("Result: %s" % ret)
+    exIP = ret['ExternalIP']
+    exPort = ret['ExternalPort']
+    changedIP = ret['ChangedIP']
+    changedPort = ret['ChangedPort']
+    if changedIP is None or changedPort is None:
+        typ = NotEnoughEvidence
+    elif ret['ExternalIP'] == source_ip:
+        changeRequest = ''.join([ChangeRequest, '0004', "00000006"])
+        ret = stun_test(s, stun_host, port, source_ip, source_port,
+                        changeRequest)
+        if ret['Resp']:
+            typ = OpenInternet
         else:
-            for stun_host in stun_servers_list:
-                log.debug('Trying STUN host: %s' % stun_host)
-                ret = stun_test(s, stun_host, port, source_ip, source_port)
-                resp = ret['Resp']
-                if resp:
-                    break
-        if not resp:
-            return Blocked, ret
+            typ = SymmetricUDPFirewall
+    else:
+        changeRequest = ''.join([ChangeRequest, '0004', "00000006"])
+        log.debug("Do Test2")
+        ret = stun_test(s, stun_host, port, source_ip, source_port,
+                        changeRequest)
+        log.debug("=========")
         log.debug("Result: %s" % ret)
-        exIP = ret['ExternalIP']
-        exPort = ret['ExternalPort']
-        changedIP = ret['ChangedIP']
-        changedPort = ret['ChangedPort']
-        if ret['ExternalIP'] == source_ip:
-            changeRequest = ''.join([ChangeRequest, '0004', "00000006"])
-            ret = stun_test(s, stun_host, port, source_ip, source_port,
-                            changeRequest)
-            if ret['Resp']:
-                typ = OpenInternet
-            else:
-                typ = SymmetricUDPFirewall
+        if ret['Resp']:
+            typ = FullCone
         else:
-            changeRequest = ''.join([ChangeRequest, '0004', "00000006"])
-            log.debug("Do Test2")
-            ret = stun_test(s, stun_host, port, source_ip, source_port,
-                            changeRequest)
+            log.debug("Do Test1")
+            ret = stun_test(s, changedIP, changedPort, source_ip, source_port)
             log.debug("Result: %s" % ret)
-            if ret['Resp']:
-                typ = FullCone
+            if not ret['Resp']:
+                typ = ChangedAddressError
             else:
-                log.debug("Do Test1")
-                ret = stun_test(s, changedIP, changedPort, source_ip, source_port)
-                log.debug("Result: %s" % ret)
-                if not ret['Resp']:
-                    typ = ChangedAddressError
-                else:
-                    if exIP == ret['ExternalIP'] and exPort == ret['ExternalPort']:
-                        changePortRequest = ''.join([ChangeRequest, '0004',
-                                                     "00000002"])
-                        log.debug("Do Test3")
-                        ret = stun_test(s, changedIP, port, source_ip, source_port,
-                                        changePortRequest)
-                        log.debug("Result: %s" % ret)
-                        if ret['Resp'] == True:
-                            typ = RestricNAT
-                        else:
-                            typ = RestricPortNAT
+                if exIP == ret['ExternalIP'] and exPort == ret['ExternalPort']:
+                    changePortRequest = ''.join([ChangeRequest, '0004',
+                                                 "00000002"])
+                    log.debug("Do Test3")
+                    ret = stun_test(s, changedIP, port, source_ip, source_port,
+                                    changePortRequest)
+                    log.debug("Result: %s" % ret)
+                    if ret['Resp']:
+                        typ = RestricNAT
                     else:
-                        typ = SymmetricNAT
-    except BindErrorResponseException:
-        pass
+                        typ = RestricPortNAT
+                else:
+                    typ = SymmetricNAT
     return typ, ret
 
 
