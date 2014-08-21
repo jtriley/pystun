@@ -8,7 +8,7 @@ README = open(os.path.join(src, 'README.rst')).read()
 
 setup(
     name='pystun',
-    version="0.0.4",
+    version="0.0.5",
     packages=find_packages(),
     scripts=['bin/pystun'],
     zip_safe=False,
@@ -23,5 +23,7 @@ setup(
         "Topic :: Internet",
         "Topic :: System :: Networking :: Firewalls",
         "Programming Language :: Python",
+        "Programming Language :: Python :: 2",
+        "Programming Language :: Python :: 3"
     ],
 )

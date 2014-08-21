@@ -29,7 +29,6 @@ def check_pep8(srcdir):
     print(">>> Running pep8...")
     clean = True
     pep8.process_options([''])
-    pep8.options.repeat=True
     for pyfile in findpy(srcdir):
         if pep8.Checker(pyfile).check_all() != 0:
             clean = False
@@ -39,12 +38,12 @@ def check_pep8(srcdir):
 def main():
     src = os.path.join(os.path.dirname(sys.argv[0]), 'stun')
     if not check_pyflakes(src):
-        print
+        print('')
         err = "ERROR: pyflakes failed on some source files\n"
         err += "ERROR: please fix the errors and re-run this script"
         print(err)
     elif not check_pep8(src):
-        print
+        print('')
         err = "ERROR: pep8 failed on some source files\n"
         err += "ERROR: please fix the errors and re-run this script"
         print(err)
