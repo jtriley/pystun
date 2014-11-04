@@ -1,24 +1,43 @@
-#coding=utf-8
-import optparse
+import argparse
 
 import stun
 
 
+def make_argument_parser():
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+
+    parser.add_argument(
+        '-d', '--debug', dest='DEBUG', action='store_true',
+        help='Enable debug logging'
+    )
+    parser.add_argument(
+        '-H', '--host', dest='stun_host',
+        help='STUN host to use'
+    )
+    parser.add_argument(
+        '-P', '--host-port', dest='stun_port', type=int, default=3478,
+        help='STUN host port to use'
+    )
+    parser.add_argument(
+        '-i', '--interface', dest='source_ip', default='0.0.0.0',
+        help='network interface for client'
+    )
+    parser.add_argument(
+        '-p', '--port', dest='source_port', type=int, default=54320,
+        help='port to listen on for client'
+    )
+
+    # TODO: Single-source version.
+    parser.add_argument('--version', action='version', version=stun.__version__)
+
+    return parser
+
+
 def main():
-    parser = optparse.OptionParser(version=stun.__version__)
-    parser.add_option("-d", "--debug", dest="DEBUG", action="store_true",
-                      default=False, help="Enable debug logging")
-    parser.add_option("-H", "--host", dest="stun_host", default=None,
-                      help="STUN host to use")
-    parser.add_option("-P", "--host-port", dest="stun_port", type="int",
-                      default=3478, help="STUN host port to use (default: "
-                      "3478)")
-    parser.add_option("-i", "--interface", dest="source_ip", default="0.0.0.0",
-                      help="network interface for client (default: 0.0.0.0)")
-    parser.add_option("-p", "--port", dest="source_port", type="int",
-                      default=54320, help="port to listen on for client "
-                      "(default: 54320)")
-    (options, args) = parser.parse_args()
+    options = make_argument_parser().parse_args()
+
     if options.DEBUG:
         stun.enable_logging()
     kwargs = dict(source_ip=options.source_ip,
