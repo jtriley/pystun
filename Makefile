@@ -1,0 +1,4 @@
+.PHONY: check
+
+check:
+	prospector
