@@ -1,2 +1,1 @@
-pep8
-pyflakes
+prospector
