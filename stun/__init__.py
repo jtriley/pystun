@@ -1,9 +1,7 @@
-#coding=utf-8
-
-import random
-import socket
 import binascii
 import logging
+import random
+import socket
 
 __version__ = '0.0.5'
 
@@ -22,7 +20,7 @@ stun_servers_list = (
     'stun.voipbuster.com',
 )
 
-#stun attributes
+# stun attributes
 MappedAddress = '0001'
 ResponseAddress = '0002'
 ChangeRequest = '0003'
@@ -37,9 +35,9 @@ ReflectedFrom = '000B'
 XorOnly = '0021'
 XorMappedAddress = '8020'
 ServerName = '8022'
-SecondaryAddress = '8050'  # Non standard extention
+SecondaryAddress = '8050'  # Non standard extension
 
-#types for a stun message
+# types for a stun message
 BindRequestMsg = '0001'
 BindResponseMsg = '0101'
 BindErrorResponseMsg = '0111'
@@ -98,7 +96,7 @@ def gen_tran_id():
     a = ''
     for i in xrange(32):
         a += random.choice('0123456789ABCDEF')
-    #return binascii.a2b_hex(a)
+    # return binascii.a2b_hex(a)
     return a
 
 
@@ -143,40 +141,42 @@ def stun_test(sock, host, port, source_ip, source_port, send_data=""):
             base = 20
             while len_remain:
                 attr_type = binascii.b2a_hex(buf[base:(base + 2)])
-                attr_len = int(binascii.b2a_hex(buf[(base + 2):(base + 4)]),
-                               16)
+                attr_len = int(binascii.b2a_hex(buf[(base + 2):(base + 4)]), 16)
                 if attr_type == MappedAddress:
                     port = int(binascii.b2a_hex(buf[base + 6:base + 8]), 16)
                     ip = ".".join([
-                    str(int(binascii.b2a_hex(buf[base + 8:base + 9]), 16)),
-                    str(int(binascii.b2a_hex(buf[base + 9:base + 10]), 16)),
-                    str(int(binascii.b2a_hex(buf[base + 10:base + 11]), 16)),
-                    str(int(binascii.b2a_hex(buf[base + 11:base + 12]), 16))])
+                        str(int(binascii.b2a_hex(buf[base + 8:base + 9]), 16)),
+                        str(int(binascii.b2a_hex(buf[base + 9:base + 10]), 16)),
+                        str(int(binascii.b2a_hex(buf[base + 10:base + 11]), 16)),
+                        str(int(binascii.b2a_hex(buf[base + 11:base + 12]), 16))
+                    ])
                     retVal['ExternalIP'] = ip
                     retVal['ExternalPort'] = port
                 if attr_type == SourceAddress:
                     port = int(binascii.b2a_hex(buf[base + 6:base + 8]), 16)
                     ip = ".".join([
-                    str(int(binascii.b2a_hex(buf[base + 8:base + 9]), 16)),
-                    str(int(binascii.b2a_hex(buf[base + 9:base + 10]), 16)),
-                    str(int(binascii.b2a_hex(buf[base + 10:base + 11]), 16)),
-                    str(int(binascii.b2a_hex(buf[base + 11:base + 12]), 16))])
+                        str(int(binascii.b2a_hex(buf[base + 8:base + 9]), 16)),
+                        str(int(binascii.b2a_hex(buf[base + 9:base + 10]), 16)),
+                        str(int(binascii.b2a_hex(buf[base + 10:base + 11]), 16)),
+                        str(int(binascii.b2a_hex(buf[base + 11:base + 12]), 16))
+                    ])
                     retVal['SourceIP'] = ip
                     retVal['SourcePort'] = port
                 if attr_type == ChangedAddress:
                     port = int(binascii.b2a_hex(buf[base + 6:base + 8]), 16)
                     ip = ".".join([
-                    str(int(binascii.b2a_hex(buf[base + 8:base + 9]), 16)),
-                    str(int(binascii.b2a_hex(buf[base + 9:base + 10]), 16)),
-                    str(int(binascii.b2a_hex(buf[base + 10:base + 11]), 16)),
-                    str(int(binascii.b2a_hex(buf[base + 11:base + 12]), 16))])
+                        str(int(binascii.b2a_hex(buf[base + 8:base + 9]), 16)),
+                        str(int(binascii.b2a_hex(buf[base + 9:base + 10]), 16)),
+                        str(int(binascii.b2a_hex(buf[base + 10:base + 11]), 16)),
+                        str(int(binascii.b2a_hex(buf[base + 11:base + 12]), 16))
+                    ])
                     retVal['ChangedIP'] = ip
                     retVal['ChangedPort'] = port
-                #if attr_type == ServerName:
-                    #serverName = buf[(base+4):(base+4+attr_len)]
+                # if attr_type == ServerName:
+                    # serverName = buf[(base+4):(base+4+attr_len)]
                 base = base + 4 + attr_len
                 len_remain = len_remain - (4 + attr_len)
-    #s.close()
+    # s.close()
     return retVal
 
 
@@ -232,7 +232,7 @@ def get_nat_type(s, source_ip, source_port, stun_host=None, stun_port=3478):
                     ret = stun_test(s, changedIP, port, source_ip, source_port,
                                     changePortRequest)
                     log.debug("Result: %s" % ret)
-                    if ret['Resp'] == True:
+                    if ret['Resp']:
                         typ = RestricNAT
                     else:
                         typ = RestricPortNAT
