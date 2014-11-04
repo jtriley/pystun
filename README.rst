@@ -1,3 +1,6 @@
+.. image:: https://travis-ci.org/Renelvon/pystun.svg?branch=master
+    :target: https://travis-ci.org/Renelvon/pystun
+
 PyStun
 ======
 A Python STUN client for getting NAT type and external IP
