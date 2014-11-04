@@ -30,7 +30,6 @@ def make_argument_parser():
         help='port to listen on for client'
     )
 
-    # TODO: Single-source version.
     parser.add_argument('--version', action='version', version=stun.__version__)
 
     return parser

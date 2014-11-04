@@ -2,13 +2,15 @@
 import os
 from setuptools import setup, find_packages
 
+import stun
+
 src = os.path.realpath(os.path.dirname(__file__))
 
 README = open(os.path.join(src, 'README.rst')).read()
 
 setup(
     name='pystun',
-    version="0.0.4",
+    version=stun.__version__,
     packages=find_packages(),
     scripts=['bin/pystun'],
     zip_safe=False,
