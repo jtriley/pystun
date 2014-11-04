@@ -1,6 +1,7 @@
+.coverage
+*.pkl
 *.pyc
 *.swp
-*.pkl
 pystun.egg-info
 build
 dist
