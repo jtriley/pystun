@@ -251,13 +251,3 @@ def get_ip_info(source_ip="0.0.0.0", source_port=54320, stun_host=None,
     external_port = nat['ExternalPort']
     s.close()
     return (nat_type, external_ip, external_port)
-
-
-def main():
-    nat_type, external_ip, external_port = get_ip_info()
-    print "NAT Type:", nat_type
-    print "External IP:", external_ip
-    print "External Port:", external_port
-
-if __name__ == '__main__':
-    main()
