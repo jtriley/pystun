@@ -29,6 +29,8 @@ def main():
             "Topic :: System :: Networking :: Firewalls",
             "Programming Language :: Python",
         ],
+        tests_require=['coverage', 'nose', 'prospector'],
+        test_suite='tests'
     )
 
 if __name__ == '__main__':
