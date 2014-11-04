@@ -4,3 +4,4 @@
 pystun.egg-info
 build
 dist
+env/
