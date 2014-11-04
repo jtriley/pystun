@@ -93,9 +93,7 @@ def _initialize():
 
 
 def gen_tran_id():
-    a = ''
-    for i in xrange(32):
-        a += random.choice('0123456789ABCDEF')
+    a = ''.join(random.choice('0123456789ABCDEF') for i in xrange(32))
     # return binascii.a2b_hex(a)
     return a
 
