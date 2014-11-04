@@ -85,15 +85,15 @@ ChangedAddressError = "Meet an error, when do Test1 on Changed IP and Port"
 
 def _initialize():
     items = dictAttrToVal.items()
-    for i in xrange(len(items)):
+    for i in range(len(items)):
         dictValToAttr.update({items[i][1]: items[i][0]})
     items = dictMsgTypeToVal.items()
-    for i in xrange(len(items)):
+    for i in range(len(items)):
         dictValToMsgType.update({items[i][1]: items[i][0]})
 
 
 def gen_tran_id():
-    a = ''.join(random.choice('0123456789ABCDEF') for i in xrange(32))
+    a = ''.join(random.choice('0123456789ABCDEF') for i in range(32))
     # return binascii.a2b_hex(a)
     return a
 
