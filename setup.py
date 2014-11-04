@@ -21,7 +21,10 @@ def main():
         description="A Python STUN client for getting NAT type and external IP (RFC 3489)",
         long_description=README,
         classifiers=[
+            "Development Status :: 4 - Beta",
             "License :: OSI Approved :: MIT License",
+            "Programming Language :: Python :: 2",
+            "Programming Language :: Python :: 2.7",
             "Topic :: Internet",
             "Topic :: System :: Networking :: Firewalls",
             "Programming Language :: Python",
