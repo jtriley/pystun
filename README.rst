@@ -11,9 +11,9 @@ only implementation.
 
 Installation
 ------------
-To install the latest stable version::
+To install the latest version::
 
-    $ easy_install pystun
+    $ pip install pystun
 
 or download/clone the source and install manually using::
 
