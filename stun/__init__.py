@@ -7,11 +7,6 @@ __version__ = '0.0.5'
 
 log = logging.getLogger("pystun")
 
-
-def enable_logging():
-    logging.basicConfig()
-    log.setLevel(logging.DEBUG)
-
 STUN_SERVERS = (
     'stun.ekiga.net',
     'stun.ideasip.com',

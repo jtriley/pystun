@@ -1,5 +1,7 @@
 from __future__ import print_function
 import argparse
+import logging
+import sys
 
 import stun
 
@@ -10,7 +12,7 @@ def make_argument_parser():
     )
 
     parser.add_argument(
-        '-d', '--debug', dest='DEBUG', action='store_true',
+        '-d', '--debug', action='store_true',
         help='Enable debug logging'
     )
     parser.add_argument(
@@ -36,18 +38,23 @@ def make_argument_parser():
 
 
 def main():
-    options = make_argument_parser().parse_args()
+    try:
+        options = make_argument_parser().parse_args()
 
-    if options.DEBUG:
-        stun.enable_logging()
-    kwargs = dict(source_ip=options.source_ip,
-                  source_port=int(options.source_port),
-                  stun_host=options.stun_host,
-                  stun_port=options.stun_port)
-    nat_type, external_ip, external_port = stun.get_ip_info(**kwargs)
-    print('NAT Type:', nat_type)
-    print('External IP:', external_ip)
-    print('External Port:', external_port)
+        if options.debug:
+            logging.basicConfig()
+            stun.log.setLevel(logging.DEBUG)
+
+        kwargs = dict(source_ip=options.source_ip,
+                      source_port=options.source_port,
+                      stun_host=options.stun_host,
+                      stun_port=options.stun_port)
+        nat_type, external_ip, external_port = stun.get_ip_info(**kwargs)
+        print('NAT Type:', nat_type)
+        print('External IP:', external_ip)
+        print('External Port:', external_port)
+    except KeyboardInterrupt:
+        sys.exit()
 
 if __name__ == '__main__':
     main()

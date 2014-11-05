@@ -12,7 +12,6 @@ def main():
         name='pystun',
         version=stun.__version__,
         packages=find_packages(),
-        scripts=['bin/pystun'],
         zip_safe=False,
         license='MIT',
         author='Justin Riley (original author: gaohawk)',
@@ -30,7 +29,12 @@ def main():
             "Programming Language :: Python",
         ],
         tests_require=['coverage', 'nose', 'prospector'],
-        test_suite='tests'
+        test_suite='tests',
+        entry_points={
+            'console_scripts': [
+                'pystun=stun.cli:main'
+            ]
+        }
     )
 
 if __name__ == '__main__':
