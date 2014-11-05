@@ -54,10 +54,7 @@ def main():
             logging.basicConfig()
             stun.log.setLevel(logging.DEBUG)
 
-        kwargs = dict(source_ip=options.source_ip,
-                      source_port=options.source_port,
-                      stun_host=options.stun_host,
-                      stun_port=options.stun_port)
+        kwargs = vars(options)
         nat_type, external_ip, external_port = stun.get_ip_info(**kwargs)
         print('NAT Type:', nat_type)
         print('External IP:', external_ip)
