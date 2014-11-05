@@ -19,6 +19,7 @@ def main():
         url='http://github.com/jtriley/pystun',
         description='A Python STUN client for getting NAT type and external IP (RFC 3489)',
         long_description=README,
+        keywords='STUN NAT',
         classifiers=[
             'Development Status :: 4 - Beta',
             'License :: OSI Approved :: MIT License',
