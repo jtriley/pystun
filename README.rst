@@ -42,20 +42,21 @@ From command line::
 Pass --help for more options::
 
     % pystun --help
-    Usage: pystun [options]
+    usage: pystun [-h] [-d] [-H STUN_HOST] [-P STUN_PORT] [-i SOURCE_IP]
+                  [-p SOURCE_PORT] [--version]
 
-    Options:
-      --version             show program's version number and exit
+    optional arguments:
       -h, --help            show this help message and exit
-      -d, --debug           Enable debug logging
-      -H STUN_HOST, --host=STUN_HOST
-                            STUN host to use
-      -P STUN_PORT, --host-port=STUN_PORT
+      -d, --debug           Enable debug logging (default: False)
+      -H STUN_HOST, --host STUN_HOST
+                            STUN host to use (default: None)
+      -P STUN_PORT, --host-port STUN_PORT
                             STUN host port to use (default: 3478)
-      -i SOURCE_IP, --interface=SOURCE_IP
+      -i SOURCE_IP, --interface SOURCE_IP
                             network interface for client (default: 0.0.0.0)
-      -p SOURCE_PORT, --port=SOURCE_PORT
+      -p SOURCE_PORT, --port SOURCE_PORT
                             port to listen on for client (default: 54320)
+      --version             show program's version number and exit
 
 From Python::
 
