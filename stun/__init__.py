@@ -12,13 +12,16 @@ def enable_logging():
     logging.basicConfig()
     log.setLevel(logging.DEBUG)
 
-stun_servers_list = (
-    "stun.ekiga.net",
-    'stunserver.org',
+STUN_SERVERS = (
+    'stun.ekiga.net',
     'stun.ideasip.com',
-    'stun.softjoys.com',
+    'stun.voiparound.com',
     'stun.voipbuster.com',
+    'stun.voipstunt.com',
+    'stun.voxgratia.org'
 )
+
+stun_servers_list = STUN_SERVERS
 
 # stun attributes
 MappedAddress = '0001'
