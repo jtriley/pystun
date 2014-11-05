@@ -10,3 +10,6 @@ install:
 
 script:
     - make
+
+after_success:
+    - coveralls
