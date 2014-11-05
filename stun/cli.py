@@ -22,21 +22,21 @@ def make_argument_parser():
         help='Enable debug logging'
     )
     parser.add_argument(
-        '-H', '--host', dest='stun_host',
+        '-H', '--stun-host',
         help='STUN host to use'
     )
     parser.add_argument(
-        '-P', '--host-port', dest='stun_port', type=int,
+        '-P', '--stun-port', type=int,
         default=DEFAULTS['stun_port'],
         help='STUN host port to use'
     )
     parser.add_argument(
-        '-i', '--interface', dest='source_ip',
+        '-i', '--source-ip',
         default=DEFAULTS['source_ip'],
         help='network interface for client'
     )
     parser.add_argument(
-        '-p', '--port', dest='source_port', type=int,
+        '-p', '--source-port', type=int,
         default=DEFAULTS['source_port'],
         help='port to listen on for client'
     )
