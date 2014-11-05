@@ -18,6 +18,12 @@ STUN_SERVERS = (
 
 stun_servers_list = STUN_SERVERS
 
+DEFAULTS = {
+    'stun_port': 3478,
+    'source_ip': '0.0.0.0',
+    'source_port': 54320
+}
+
 # stun attributes
 MappedAddress = '0001'
 ResponseAddress = '0002'

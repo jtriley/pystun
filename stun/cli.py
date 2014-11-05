@@ -5,12 +5,6 @@ import sys
 
 import stun
 
-DEFAULTS = {
-    'stun_port': 3478,
-    'source_ip': '0.0.0.0',
-    'source_port': 54320
-}
-
 
 def make_argument_parser():
     parser = argparse.ArgumentParser(
@@ -27,17 +21,17 @@ def make_argument_parser():
     )
     parser.add_argument(
         '-P', '--stun-port', type=int,
-        default=DEFAULTS['stun_port'],
+        default=stun.DEFAULTS['stun_port'],
         help='STUN host port to use'
     )
     parser.add_argument(
         '-i', '--source-ip',
-        default=DEFAULTS['source_ip'],
+        default=stun.DEFAULTS['source_ip'],
         help='network interface for client'
     )
     parser.add_argument(
         '-p', '--source-port', type=int,
-        default=DEFAULTS['source_port'],
+        default=stun.DEFAULTS['source_port'],
         help='port to listen on for client'
     )
 
