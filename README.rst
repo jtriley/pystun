@@ -1,5 +1,5 @@
-.. image:: https://travis-ci.org/Renelvon/pystun.svg?branch=master
-    :target: https://travis-ci.org/Renelvon/pystun
+.. image:: https://travis-ci.org/jtriley/pystun.svg?branch=master
+    :target: https://travis-ci.org/jtriley/pystun
 
 .. image:: https://coveralls.io/repos/Renelvon/pystun/badge.png
    :target: https://coveralls.io/r/Renelvon/pystun
