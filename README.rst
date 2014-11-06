@@ -1,8 +1,8 @@
 .. image:: https://travis-ci.org/jtriley/pystun.svg?branch=master
     :target: https://travis-ci.org/jtriley/pystun
 
-.. image:: https://coveralls.io/repos/Renelvon/pystun/badge.png
-   :target: https://coveralls.io/r/Renelvon/pystun
+.. image:: https://coveralls.io/repos/jtriley/pystun/badge.png
+   :target: https://coveralls.io/r/jtriley/pystun
 
 
 PyStun
