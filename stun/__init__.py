@@ -1,28 +1,30 @@
-#coding=utf-8
-
-import random
-import socket
 import binascii
 import logging
+import random
+import socket
 
-__version__ = "0.0.4"
+__version__ = '0.1.0'
 
 log = logging.getLogger("pystun")
 
-
-def enable_logging():
-    logging.basicConfig()
-    log.setLevel(logging.DEBUG)
-
-stun_servers_list = (
-    "stun.ekiga.net",
-    'stunserver.org',
+STUN_SERVERS = (
+    'stun.ekiga.net',
     'stun.ideasip.com',
-    'stun.softjoys.com',
+    'stun.voiparound.com',
     'stun.voipbuster.com',
+    'stun.voipstunt.com',
+    'stun.voxgratia.org'
 )
 
-#stun attributes
+stun_servers_list = STUN_SERVERS
+
+DEFAULTS = {
+    'stun_port': 3478,
+    'source_ip': '0.0.0.0',
+    'source_port': 54320
+}
+
+# stun attributes
 MappedAddress = '0001'
 ResponseAddress = '0002'
 ChangeRequest = '0003'
@@ -37,9 +39,9 @@ ReflectedFrom = '000B'
 XorOnly = '0021'
 XorMappedAddress = '8020'
 ServerName = '8022'
-SecondaryAddress = '8050'  # Non standard extention
+SecondaryAddress = '8050'  # Non standard extension
 
-#types for a stun message
+# types for a stun message
 BindRequestMsg = '0001'
 BindResponseMsg = '0101'
 BindErrorResponseMsg = '0111'
@@ -87,18 +89,16 @@ ChangedAddressError = "Meet an error, when do Test1 on Changed IP and Port"
 
 def _initialize():
     items = dictAttrToVal.items()
-    for i in xrange(len(items)):
+    for i in range(len(items)):
         dictValToAttr.update({items[i][1]: items[i][0]})
     items = dictMsgTypeToVal.items()
-    for i in xrange(len(items)):
+    for i in range(len(items)):
         dictValToMsgType.update({items[i][1]: items[i][0]})
 
 
 def gen_tran_id():
-    a = ''
-    for i in xrange(32):
-        a += random.choice('0123456789ABCDEF')
-    #return binascii.a2b_hex(a)
+    a = ''.join(random.choice('0123456789ABCDEF') for i in range(32))
+    # return binascii.a2b_hex(a)
     return a
 
 
@@ -115,7 +115,7 @@ def stun_test(sock, host, port, source_ip, source_port, send_data=""):
         recieved = False
         count = 3
         while not recieved:
-            log.debug("sendto %s" % str((host, port)))
+            log.debug("sendto: %s", (host, port))
             try:
                 sock.sendto(data, (host, port))
             except socket.gaierror:
@@ -123,7 +123,7 @@ def stun_test(sock, host, port, source_ip, source_port, send_data=""):
                 return retVal
             try:
                 buf, addr = sock.recvfrom(2048)
-                log.debug("recvfrom: %s" % str(addr))
+                log.debug("recvfrom: %s", addr)
                 recieved = True
             except Exception:
                 recieved = False
@@ -143,40 +143,42 @@ def stun_test(sock, host, port, source_ip, source_port, send_data=""):
             base = 20
             while len_remain:
                 attr_type = binascii.b2a_hex(buf[base:(base + 2)])
-                attr_len = int(binascii.b2a_hex(buf[(base + 2):(base + 4)]),
-                               16)
+                attr_len = int(binascii.b2a_hex(buf[(base + 2):(base + 4)]), 16)
                 if attr_type == MappedAddress:
                     port = int(binascii.b2a_hex(buf[base + 6:base + 8]), 16)
                     ip = ".".join([
-                    str(int(binascii.b2a_hex(buf[base + 8:base + 9]), 16)),
-                    str(int(binascii.b2a_hex(buf[base + 9:base + 10]), 16)),
-                    str(int(binascii.b2a_hex(buf[base + 10:base + 11]), 16)),
-                    str(int(binascii.b2a_hex(buf[base + 11:base + 12]), 16))])
+                        str(int(binascii.b2a_hex(buf[base + 8:base + 9]), 16)),
+                        str(int(binascii.b2a_hex(buf[base + 9:base + 10]), 16)),
+                        str(int(binascii.b2a_hex(buf[base + 10:base + 11]), 16)),
+                        str(int(binascii.b2a_hex(buf[base + 11:base + 12]), 16))
+                    ])
                     retVal['ExternalIP'] = ip
                     retVal['ExternalPort'] = port
                 if attr_type == SourceAddress:
                     port = int(binascii.b2a_hex(buf[base + 6:base + 8]), 16)
                     ip = ".".join([
-                    str(int(binascii.b2a_hex(buf[base + 8:base + 9]), 16)),
-                    str(int(binascii.b2a_hex(buf[base + 9:base + 10]), 16)),
-                    str(int(binascii.b2a_hex(buf[base + 10:base + 11]), 16)),
-                    str(int(binascii.b2a_hex(buf[base + 11:base + 12]), 16))])
+                        str(int(binascii.b2a_hex(buf[base + 8:base + 9]), 16)),
+                        str(int(binascii.b2a_hex(buf[base + 9:base + 10]), 16)),
+                        str(int(binascii.b2a_hex(buf[base + 10:base + 11]), 16)),
+                        str(int(binascii.b2a_hex(buf[base + 11:base + 12]), 16))
+                    ])
                     retVal['SourceIP'] = ip
                     retVal['SourcePort'] = port
                 if attr_type == ChangedAddress:
                     port = int(binascii.b2a_hex(buf[base + 6:base + 8]), 16)
                     ip = ".".join([
-                    str(int(binascii.b2a_hex(buf[base + 8:base + 9]), 16)),
-                    str(int(binascii.b2a_hex(buf[base + 9:base + 10]), 16)),
-                    str(int(binascii.b2a_hex(buf[base + 10:base + 11]), 16)),
-                    str(int(binascii.b2a_hex(buf[base + 11:base + 12]), 16))])
+                        str(int(binascii.b2a_hex(buf[base + 8:base + 9]), 16)),
+                        str(int(binascii.b2a_hex(buf[base + 9:base + 10]), 16)),
+                        str(int(binascii.b2a_hex(buf[base + 10:base + 11]), 16)),
+                        str(int(binascii.b2a_hex(buf[base + 11:base + 12]), 16))
+                    ])
                     retVal['ChangedIP'] = ip
                     retVal['ChangedPort'] = port
-                #if attr_type == ServerName:
-                    #serverName = buf[(base+4):(base+4+attr_len)]
+                # if attr_type == ServerName:
+                    # serverName = buf[(base+4):(base+4+attr_len)]
                 base = base + 4 + attr_len
                 len_remain = len_remain - (4 + attr_len)
-    #s.close()
+    # s.close()
     return retVal
 
 
@@ -190,14 +192,14 @@ def get_nat_type(s, source_ip, source_port, stun_host=None, stun_port=3478):
         resp = ret['Resp']
     else:
         for stun_host in stun_servers_list:
-            log.debug('Trying STUN host: %s' % stun_host)
+            log.debug('Trying STUN host: %s', stun_host)
             ret = stun_test(s, stun_host, port, source_ip, source_port)
             resp = ret['Resp']
             if resp:
                 break
     if not resp:
         return Blocked, ret
-    log.debug("Result: %s" % ret)
+    log.debug("Result: %s", ret)
     exIP = ret['ExternalIP']
     exPort = ret['ExternalPort']
     changedIP = ret['ChangedIP']
@@ -215,13 +217,13 @@ def get_nat_type(s, source_ip, source_port, stun_host=None, stun_port=3478):
         log.debug("Do Test2")
         ret = stun_test(s, stun_host, port, source_ip, source_port,
                         changeRequest)
-        log.debug("Result: %s" % ret)
+        log.debug("Result: %s", ret)
         if ret['Resp']:
             typ = FullCone
         else:
             log.debug("Do Test1")
             ret = stun_test(s, changedIP, changedPort, source_ip, source_port)
-            log.debug("Result: %s" % ret)
+            log.debug("Result: %s", ret)
             if not ret['Resp']:
                 typ = ChangedAddressError
             else:
@@ -231,8 +233,8 @@ def get_nat_type(s, source_ip, source_port, stun_host=None, stun_port=3478):
                     log.debug("Do Test3")
                     ret = stun_test(s, changedIP, port, source_ip, source_port,
                                     changePortRequest)
-                    log.debug("Result: %s" % ret)
-                    if ret['Resp'] == True:
+                    log.debug("Result: %s", ret)
+                    if ret['Resp']:
                         typ = RestricNAT
                     else:
                         typ = RestricPortNAT
@@ -253,13 +255,3 @@ def get_ip_info(source_ip="0.0.0.0", source_port=54320, stun_host=None,
     external_port = nat['ExternalPort']
     s.close()
     return (nat_type, external_ip, external_port)
-
-
-def main():
-    nat_type, external_ip, external_port = get_ip_info()
-    print "NAT Type:", nat_type
-    print "External IP:", external_ip
-    print "External Port:", external_port
-
-if __name__ == '__main__':
-    main()

@@ -1,3 +1,10 @@
+.. image:: https://travis-ci.org/jtriley/pystun.svg?branch=master
+    :target: https://travis-ci.org/jtriley/pystun
+
+.. image:: https://coveralls.io/repos/jtriley/pystun/badge.png
+   :target: https://coveralls.io/r/jtriley/pystun
+
+
 PyStun
 ======
 A Python STUN client for getting NAT type and external IP
@@ -11,9 +18,9 @@ only implementation.
 
 Installation
 ------------
-To install the latest stable version::
+To install the latest version::
 
-    $ easy_install pystun
+    $ pip install pystun
 
 or download/clone the source and install manually using::
 
@@ -39,20 +46,21 @@ From command line::
 Pass --help for more options::
 
     % pystun --help
-    Usage: pystun [options]
+    usage: pystun [-h] [-d] [-H STUN_HOST] [-P STUN_PORT] [-i SOURCE_IP]
+                  [-p SOURCE_PORT] [--version]
 
-    Options:
-      --version             show program's version number and exit
+    optional arguments:
       -h, --help            show this help message and exit
-      -d, --debug           Enable debug logging
-      -H STUN_HOST, --host=STUN_HOST
-                            STUN host to use
-      -P STUN_PORT, --host-port=STUN_PORT
+      -d, --debug           Enable debug logging (default: False)
+      -H STUN_HOST, --host STUN_HOST
+                            STUN host to use (default: None)
+      -P STUN_PORT, --host-port STUN_PORT
                             STUN host port to use (default: 3478)
-      -i SOURCE_IP, --interface=SOURCE_IP
+      -i SOURCE_IP, --interface SOURCE_IP
                             network interface for client (default: 0.0.0.0)
-      -p SOURCE_PORT, --port=SOURCE_PORT
+      -p SOURCE_PORT, --port SOURCE_PORT
                             port to listen on for client (default: 54320)
+      --version             show program's version number and exit
 
 From Python::
 
@@ -83,17 +91,3 @@ Read the code for more details...
 LICENSE
 -------
 MIT
-
-Changelog
----------
-0.0.4 (10/14/2013)
-******************
-- Stun: added functionality to pass the initial STUN server port explicitly
-
-0.0.3 (05/21/2013)
-******************
-- Stun: fix UnboundLocalError in get_nat_type.
-- Stun: remove dead hosts from stun server list.
-- Handling get address info error.
-- Add version info to stun module and stun.cli.
-- Add MANIFEST.in and include README.rst.

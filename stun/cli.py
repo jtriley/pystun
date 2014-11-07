@@ -1,34 +1,60 @@
-#coding=utf-8
-import optparse
+from __future__ import print_function
+import argparse
+import logging
+import sys
 
 import stun
 
 
+def make_argument_parser():
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+
+    parser.add_argument(
+        '-d', '--debug', action='store_true',
+        help='Enable debug logging'
+    )
+    parser.add_argument(
+        '-H', '--stun-host',
+        help='STUN host to use'
+    )
+    parser.add_argument(
+        '-P', '--stun-port', type=int,
+        default=stun.DEFAULTS['stun_port'],
+        help='STUN host port to use'
+    )
+    parser.add_argument(
+        '-i', '--source-ip',
+        default=stun.DEFAULTS['source_ip'],
+        help='network interface for client'
+    )
+    parser.add_argument(
+        '-p', '--source-port', type=int,
+        default=stun.DEFAULTS['source_port'],
+        help='port to listen on for client'
+    )
+
+    parser.add_argument('--version', action='version', version=stun.__version__)
+
+    return parser
+
+
 def main():
-    parser = optparse.OptionParser(version=stun.__version__)
-    parser.add_option("-d", "--debug", dest="DEBUG", action="store_true",
-                      default=False, help="Enable debug logging")
-    parser.add_option("-H", "--host", dest="stun_host", default=None,
-                      help="STUN host to use")
-    parser.add_option("-P", "--host-port", dest="stun_port", type="int",
-                      default=3478, help="STUN host port to use (default: "
-                      "3478)")
-    parser.add_option("-i", "--interface", dest="source_ip", default="0.0.0.0",
-                      help="network interface for client (default: 0.0.0.0)")
-    parser.add_option("-p", "--port", dest="source_port", type="int",
-                      default=54320, help="port to listen on for client "
-                      "(default: 54320)")
-    (options, args) = parser.parse_args()
-    if options.DEBUG:
-        stun.enable_logging()
-    kwargs = dict(source_ip=options.source_ip,
-                  source_port=int(options.source_port),
-                  stun_host=options.stun_host,
-                  stun_port=options.stun_port)
-    nat_type, external_ip, external_port = stun.get_ip_info(**kwargs)
-    print "NAT Type:", nat_type
-    print "External IP:", external_ip
-    print "External Port:", external_port
+    try:
+        options = make_argument_parser().parse_args()
+
+        if options.debug:
+            logging.basicConfig()
+            stun.log.setLevel(logging.DEBUG)
+
+        kwargs = vars(options)
+        nat_type, external_ip, external_port = stun.get_ip_info(**kwargs)
+        print('NAT Type:', nat_type)
+        print('External IP:', external_ip)
+        print('External Port:', external_port)
+    except KeyboardInterrupt:
+        sys.exit()
 
 if __name__ == '__main__':
     main()
