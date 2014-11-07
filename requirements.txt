@@ -1,2 +1,4 @@
-pep8
-pyflakes
+coverage
+nose
+prospector
+python-coveralls
