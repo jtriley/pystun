@@ -1,6 +1,6 @@
 Changelog
 ---------
-0.0.5 (05/11/2014)
+0.1.0 (2014/11/07)
 ******************
 - Drop support for Python 2.6 and earlier.
 - Add a proper LICENSE file.
@@ -19,11 +19,11 @@ Changelog
 - Drop optparse in favour of argparse.
 - Update usage message in README.
 
-0.0.4 (14/10/2013)
+0.0.4 (2013/10/14)
 ******************
 - Stun: added functionality to pass the initial STUN server port explicitly
 
-0.0.3 (21/05/2013)
+0.0.3 (2013/05/21)
 ******************
 - Stun: fix UnboundLocalError in get_nat_type.
 - Stun: remove dead hosts from stun server list.
