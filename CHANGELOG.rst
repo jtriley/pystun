@@ -1,5 +1,9 @@
 Changelog
 ---------
+1.0.0 (2018/06/12)
+******************
+- Release as ``pystun3`` with support for Python 3.
+
 0.1.0 (2014/11/07)
 ******************
 - Drop support for Python 2.6 and earlier.

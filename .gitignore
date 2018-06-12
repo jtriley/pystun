@@ -1,8 +1,8 @@
-.coverage
 *.pkl
 *.pyc
 *.swp
-pystun.egg-info
-build
-dist
-env/
+.coverage
+build/
+dist/
+pystun3.egg-info
+venv/

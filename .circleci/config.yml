@@ -1,0 +1,67 @@
+version: 2
+
+jobs:
+  lint2:
+    docker:
+    - image: python:2.7.14
+    steps:
+    - checkout
+    - run: pip install prospector
+    - run: prospector
+
+  lint3:
+    docker:
+    - image: python:3.6.4
+    steps:
+    - checkout
+    - run: pip install prospector
+    - run: prospector
+
+  test27:
+    docker:
+    - image: python:2.7.14
+    steps:
+    - checkout
+    - run: pip install nose
+    - run: nosetests --with-coverage --cover-package=stun --cover-inclusive ./tests
+
+  test34:
+    docker:
+    - image: python:3.4.8
+    steps:
+    - checkout
+    - run: pip install nose
+    - run: nosetests --with-coverage --cover-package=stun --cover-inclusive ./tests
+
+  test35:
+    docker:
+    - image: python:3.5.5
+    steps:
+    - checkout
+    - run: pip install nose
+    - run: nosetests --with-coverage --cover-package=stun --cover-inclusive ./tests
+
+  test36:
+    docker:
+    - image: python:3.6.4
+    steps:
+    - checkout
+    - run: pip install nose
+    - run: nosetests --with-coverage --cover-package=stun --cover-inclusive ./tests
+
+workflows:
+  version: 2
+  run-jobs:
+    jobs:
+    - lint2
+    - lint3
+    - test27
+    - test34
+    - test35
+    - test36
+
+experimental:
+  notify:
+    branches:
+      only:
+      - master

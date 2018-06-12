@@ -9,14 +9,14 @@ def main():
     README = open(os.path.join(src, 'README.rst')).read()
 
     setup(
-        name='pystun',
+        name='pystun3',
         version=stun.__version__,
         packages=find_packages(),
         zip_safe=False,
         license='MIT',
-        author='Justin Riley (original author: gaohawk)',
-        author_email='justin.t.riley@gmail.com',
-        url='http://github.com/jtriley/pystun',
+        author='TalkIQ (original authors: gaohawk, Justin Riley)',
+        author_email='engineering@talkiq.com',
+        url='http://github.com/talkiq/pystun3',
         description='A Python STUN client for getting NAT type and external IP (RFC 3489)',
         long_description=README,
         keywords='STUN NAT',
@@ -32,7 +32,7 @@ def main():
         test_suite='tests',
         entry_points={
             'console_scripts': [
-                'pystun=stun.cli:main'
+                'pystun3=stun.cli:main'
             ]
         }
     )
