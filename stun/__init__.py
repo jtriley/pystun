@@ -8,6 +8,7 @@ __version__ = '0.1.0'
 log = logging.getLogger("pystun")
 
 STUN_SERVERS = (
+    'stun.freeswitch.org',
     'stun.ekiga.net',
     'stun.ideasip.com',
     'stun.voiparound.com',
@@ -89,9 +90,11 @@ ChangedAddressError = "Meet an error, when do Test1 on Changed IP and Port"
 
 def _initialize():
     items = dictAttrToVal.items()
+    items = list(items)
     for i in range(len(items)):
         dictValToAttr.update({items[i][1]: items[i][0]})
     items = dictMsgTypeToVal.items()
+    items = list(items)
     for i in range(len(items)):
         dictValToMsgType.update({items[i][1]: items[i][0]})
 
@@ -132,9 +135,9 @@ def stun_test(sock, host, port, source_ip, source_port, send_data=""):
                 else:
                     retVal['Resp'] = False
                     return retVal
-        msgtype = binascii.b2a_hex(buf[0:2])
-        bind_resp_msg = dictValToMsgType[msgtype] == "BindResponseMsg"
-        tranid_match = tranid.upper() == binascii.b2a_hex(buf[4:20]).upper()
+        msgtype = binascii.b2a_hex(buf[0:2])        
+        bind_resp_msg = dictValToMsgType[msgtype.decode()] == "BindResponseMsg"
+        tranid_match = tranid.upper() == binascii.b2a_hex(buf[4:20]).upper().decode()
         if bind_resp_msg and tranid_match:
             recvCorr = True
             retVal['Resp'] = True
@@ -142,10 +145,10 @@ def stun_test(sock, host, port, source_ip, source_port, send_data=""):
             len_remain = len_message
             base = 20
             while len_remain:
-                attr_type = binascii.b2a_hex(buf[base:(base + 2)])
+                attr_type = binascii.b2a_hex(buf[base:(base + 2)]).decode()
                 attr_len = int(binascii.b2a_hex(buf[(base + 2):(base + 4)]), 16)
                 if attr_type == MappedAddress:
-                    port = int(binascii.b2a_hex(buf[base + 6:base + 8]), 16)
+                    port = int(binascii.b2a_hex(buf[base + 6:base + 8]), 16)                    
                     ip = ".".join([
                         str(int(binascii.b2a_hex(buf[base + 8:base + 9]), 16)),
                         str(int(binascii.b2a_hex(buf[base + 9:base + 10]), 16)),
@@ -177,7 +180,7 @@ def stun_test(sock, host, port, source_ip, source_port, send_data=""):
                 # if attr_type == ServerName:
                     # serverName = buf[(base+4):(base+4+attr_len)]
                 base = base + 4 + attr_len
-                len_remain = len_remain - (4 + attr_len)
+                len_remain = len_remain - (4 + attr_len)                
     # s.close()
     return retVal
 
@@ -245,8 +248,8 @@ def get_nat_type(s, source_ip, source_port, stun_host=None, stun_port=3478):
 
 def get_ip_info(source_ip="0.0.0.0", source_port=54320, stun_host=None,
                 stun_port=3478):
+    socket.setdefaulttimeout(2)
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.settimeout(2)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind((source_ip, source_port))
     nat_type, nat = get_nat_type(s, source_ip, source_port,
