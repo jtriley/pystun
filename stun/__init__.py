@@ -88,12 +88,10 @@ ChangedAddressError = "Meet an error, when do Test1 on Changed IP and Port"
 
 
 def _initialize():
-    items = dictAttrToVal.items()
-    for i in range(len(items)):
-        dictValToAttr.update({items[i][1]: items[i][0]})
-    items = dictMsgTypeToVal.items()
-    for i in range(len(items)):
-        dictValToMsgType.update({items[i][1]: items[i][0]})
+    for attr, value in dictAttrToVal.items():
+        dictValToAttr[value] = attr
+    for msg_type, value in dictMsgTypeToVal.items():
+        dictValToMsgType[value] = msg_type
 
 
 def gen_tran_id():
@@ -132,9 +130,9 @@ def stun_test(sock, host, port, source_ip, source_port, send_data=""):
                 else:
                     retVal['Resp'] = False
                     return retVal
-        msgtype = binascii.b2a_hex(buf[0:2])
+        msgtype = binascii.b2a_hex(buf[0:2]).decode()
         bind_resp_msg = dictValToMsgType[msgtype] == "BindResponseMsg"
-        tranid_match = tranid.upper() == binascii.b2a_hex(buf[4:20]).upper()
+        tranid_match = tranid.upper() == binascii.b2a_hex(buf[4:20]).decode().upper()
         if bind_resp_msg and tranid_match:
             recvCorr = True
             retVal['Resp'] = True
@@ -142,7 +140,7 @@ def stun_test(sock, host, port, source_ip, source_port, send_data=""):
             len_remain = len_message
             base = 20
             while len_remain:
-                attr_type = binascii.b2a_hex(buf[base:(base + 2)])
+                attr_type = binascii.b2a_hex(buf[base:(base + 2)]).decode()
                 attr_len = int(binascii.b2a_hex(buf[(base + 2):(base + 4)]), 16)
                 if attr_type == MappedAddress:
                     port = int(binascii.b2a_hex(buf[base + 6:base + 8]), 16)
@@ -188,14 +186,17 @@ def get_nat_type(s, source_ip, source_port, stun_host=None, stun_port=3478):
     log.debug("Do Test1")
     resp = False
     if stun_host:
+        log.debug('Trying STUN host: %s', stun_host)
         ret = stun_test(s, stun_host, port, source_ip, source_port)
         resp = ret['Resp']
     else:
-        for stun_host in stun_servers_list:
-            log.debug('Trying STUN host: %s', stun_host)
-            ret = stun_test(s, stun_host, port, source_ip, source_port)
+        log.debug('Trying all STUN hosts')
+        for stun_server in stun_servers_list:
+            log.debug(' - %s', stun_server)
+            ret = stun_test(s, stun_server, port, source_ip, source_port)
             resp = ret['Resp']
             if resp:
+                stun_host = stun_server
                 break
     if not resp:
         return Blocked, ret
