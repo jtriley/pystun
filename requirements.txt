@@ -1,4 +1,3 @@
 coverage
-nose
 prospector
-python-coveralls
+pytest

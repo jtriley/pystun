@@ -12,7 +12,8 @@ check:
 	prospector
 
 unittest:
-	nosetests --with-coverage --cover-package=stun --cover-inclusive $(TESTPATH)
+	coverage run --source=$(STUNPATH) -m pytest $(TESTPATH)
+	coverage report -m
 
 clean:
 	rm -rf pystun.egg-info
