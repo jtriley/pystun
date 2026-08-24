@@ -1,2 +1,19 @@
 inherits:
     - strictness_low
+
+ignore-paths:
+    - build
+    - dist
+
+pep8:
+    disable:
+        # Public module-level names kept for backwards compatibility.
+        - N816
+
+pylint:
+    disable:
+        # stun_test's signature is part of the public API.
+        - too-many-positional-arguments
+        # get_nat_type deliberately reuses stun_host to hold the host that
+        # answered, and reads it back after the loop.
+        - redefined-argument-from-local

@@ -1,8 +1,5 @@
-.. image:: https://travis-ci.org/jtriley/pystun.svg?branch=master
-    :target: https://travis-ci.org/jtriley/pystun
-
-.. image:: https://coveralls.io/repos/jtriley/pystun/badge.png
-   :target: https://coveralls.io/r/jtriley/pystun
+.. image:: https://github.com/jtriley/pystun/actions/workflows/ci.yml/badge.svg
+    :target: https://github.com/jtriley/pystun/actions/workflows/ci.yml
 
 
 PyStun
@@ -25,14 +22,16 @@ To install the latest version::
 or download/clone the source and install manually using::
 
     $ cd /path/to/pystun/src
-    $ python setup.py install
+    $ pip install .
 
-If you're hacking on pystun you should use the 'develop' command instead::
+If you're hacking on pystun you should install in editable mode instead::
 
-    $ python setup.py develop
+    $ pip install -e .
 
 This will make a link to the sources inside your site-packages directory so
 that any changes are immediately available for testing.
+
+pystun requires Python 3.9 or later.
 
 Usage
 -----
@@ -49,16 +48,16 @@ Pass --help for more options::
     usage: pystun [-h] [-d] [-H STUN_HOST] [-P STUN_PORT] [-i SOURCE_IP]
                   [-p SOURCE_PORT] [--version]
 
-    optional arguments:
+    options:
       -h, --help            show this help message and exit
       -d, --debug           Enable debug logging (default: False)
-      -H STUN_HOST, --host STUN_HOST
+      -H, --stun-host STUN_HOST
                             STUN host to use (default: None)
-      -P STUN_PORT, --host-port STUN_PORT
+      -P, --stun-port STUN_PORT
                             STUN host port to use (default: 3478)
-      -i SOURCE_IP, --interface SOURCE_IP
+      -i, --source-ip SOURCE_IP
                             network interface for client (default: 0.0.0.0)
-      -p SOURCE_PORT, --port SOURCE_PORT
+      -p, --source-port SOURCE_PORT
                             port to listen on for client (default: 54320)
       --version             show program's version number and exit
 
